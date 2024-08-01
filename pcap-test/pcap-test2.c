@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <arpa/inet.h>
-#include <netinet/if_ether.h> // For ETHERTYPE_IP and related constants
+#include <netinet/if_ether.h> // ETHERTYPE_IP
 #include "mylibnet-headers.h"
 
 void usage() {
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
                eth_header->ether_dhost[0], eth_header->ether_dhost[1], eth_header->ether_dhost[2],
                eth_header->ether_dhost[3], eth_header->ether_dhost[4], eth_header->ether_dhost[5]);
 
-        // Check if the packet is IP packet
+        // IP packet
         if (ntohs(eth_header->ether_type) == ETHERTYPE_IP) {
             // IP header
             struct libnet_ipv4_hdr* ip_header = (struct libnet_ipv4_hdr*)(packet + sizeof(struct libnet_ethernet_hdr));
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
                    ntohl(ip_header->ip_src.s_addr),
                    ntohl(ip_header->ip_dst.s_addr));
 
-            // Check if the packet is TCP packet
+            // TCP packet
             if (ip_header->ip_p == IPPROTO_TCP) {
                 // TCP header
                 struct libnet_tcp_hdr* tcp_header = (struct libnet_tcp_hdr*)(packet + sizeof(struct libnet_ethernet_hdr) + ip_header->ip_hl * 4);
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
                        ntohs(tcp_header->th_sport),
                        ntohs(tcp_header->th_dport));
 
-                // Data payload (start of TCP data)
+                // Data(TCP data)
                 const u_char* data = packet + sizeof(struct libnet_ethernet_hdr) + ip_header->ip_hl * 4 + tcp_header->th_off * 4;
                 int data_len = header->caplen - (data - packet);
 
